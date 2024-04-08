@@ -56,25 +56,25 @@ wd<-setwd("C:/Users/ellen.yasumiishi/Work/GitHub/Sockeye-Ecology-and-Evolution")
 
 #Data set to estimate annual indices
 #Simply removed missing years
-temp<-read.csv("IYSsockeyeCovariates30.csv") 
-Year=temp[,1]	      #Survey year
-Lat	=temp[,2]       #Latitude
-Lon	=temp[,3]       #Longitude
-SST	=temp[,4]       #Sea temperature at 20 m depth
-A0PollockN =temp[,5]#Catch (numbers) of age-0 pollock	
-J_Pink =temp[,6]	  #Catch (kg) of juvenile pink salmon
-Calanus	=temp[,7]   #Calanus copepod density
-AirT	=temp[,8]     #Air temperature not used
-HaulDate	=temp[,9] #Date of surface tow
-StationID	=temp[,10]#Station identification
-AreaSwept	=temp[,11]#Are swept (km^2) of the surface trawl net tow
-kg	=temp[,12]      #Catch (kg) of juvenile sockeye salmon
-Sci	=temp[,13]      #Species name
-vessel	=temp[,14]  #Vessel ID
-Julian	=temp[,15]  #Julian day of the sample
-Constant=temp[,16]  #Constant used for Calanus
-Lat_rnd=temp[,17]   #Rounded Latitude 
-Lon_rnd=temp[,18]   #Rounded Longitude
+temp2<-read.csv("IYSsockeyeCovariates30.csv") 
+Year=temp2[,1]	      #Survey year
+Lat	=temp2[,2]       #Latitude
+Lon	=temp2[,3]       #Longitude
+SST	=temp2[,4]       #Sea temperature at 20 m depth
+A0PollockN =temp2[,5]#Catch (numbers) of age-0 pollock	
+J_Pink =temp2[,6]	  #Catch (kg) of juvenile pink salmon
+Calanus	=temp2[,7]   #Calanus copepod density
+AirT	=temp2[,8]     #Air temperature not used
+HaulDate	=temp2[,9] #Date of surface tow
+StationID	=temp2[,10]#Station identification
+AreaSwept	=temp2[,11]#Are swept (km^2) of the surface trawl net tow
+kg	=temp2[,12]      #Catch (kg) of juvenile sockeye salmon
+Sci	=temp2[,13]      #Species name
+vessel	=temp2[,14]  #Vessel ID
+Julian	=temp2[,15]  #Julian day of the sample
+Constant=temp2[,16]  #Constant used for Calanus
+Lat_rnd=temp2[,17]   #Rounded Latitude 
+Lon_rnd=temp2[,18]   #Rounded Longitude
 
 
 # Exploratory Plots ========================================================================
@@ -83,7 +83,7 @@ if(do.explore.plot==TRUE) {
   
   # Catch Distribution by year
   
-  g <- ggplot(temp, aes(kg)) +
+  g <- ggplot(temp2, aes(kg)) +
     theme_linedraw() +
     geom_histogram(fill='blue', color='black') +
     facet_wrap(~factor(Year), scales='fixed') +
@@ -92,14 +92,14 @@ if(do.explore.plot==TRUE) {
   ggsave(file.path(wd, "Wt Distribution.png"), plot=g, height=8, width=9, units='in')
 
   # Determine proportion of observations with zero catch
-  sum.ec <- temp %>% group_by(Year) %>% summarize(zero=sum(SST==0), nonZero=sum(SST>0), 
+  sum.ec <- temp2 %>% group_by(Year) %>% summarize(zero=sum(SST==0), nonZero=sum(SST>0), 
                                                   n=n(),
                                                   prop.zero=sum(SST==0)/n())
   sum.ec
   write.csv(sum.ec, file=file.path(wd, "Summary of Encounter Prob.csv"))
   
   # Effort Distribution
-  g.eff <- ggplot(temp, aes(AreaSwept)) +
+  g.eff <- ggplot(temp2, aes(AreaSwept)) +
     theme_linedraw() +
     geom_histogram(fill='blue', color='black') +
     facet_wrap(~factor(Year), scales='free') +
@@ -109,7 +109,7 @@ if(do.explore.plot==TRUE) {
 
     # Plot Map of Catch Rates
   CPU<-log((kg/AreaSwept)+1)
-    gmap<-ggplot(temp, aes(x=Lon, y=Lat, color=CPU)) +
+    gmap<-ggplot(temp2, aes(x=Lon, y=Lat, color=CPU)) +
     theme_linedraw() +
     scale_color_viridis() +
     geom_point(size=2) +
@@ -126,12 +126,12 @@ if(do.explore.plot==TRUE) {
   ggsave(file.path(wd, "Map of Wt.png"), plot=gmap, height=8, width=9, units='in')
   
   #Mean annual sea temperatures at 20m
-  mean.SST <- temp %>% group_by(Year) %>% dplyr::summarize(mean_SST=mean(SST))
+  mean.SST <- temp2 %>% group_by(Year) %>% dplyr::summarize(mean_SST=mean(SST))
   length(SST)
   mean.SST
   
     # Plot Number of Hauls per year
-  haul.count <- temp %>% group_by(Year) %>% summarize(n=n())
+  haul.count <- temp2 %>% group_by(Year) %>% summarize(n=n())
 
     g.haul <- ggplot(haul.count, aes(x=Year, y=n, fill=n)) +
     theme_bw() +
@@ -196,7 +196,7 @@ p<-ggplot()+
   geom_sf(data=russia)+
   geom_sf(data=AK)+
   geom_sf(data=depth_c, aes(color=level), colour=c("grey35","grey50","grey75"))+
-  geom_point(data=temp, aes(Lon_rnd, Lat_rnd, group=NULL), shape=4)+
+  geom_point(data=temp2, aes(Lon_rnd, Lat_rnd, group=NULL), shape=4)+
   coord_sf(xlim=c(-178, -150), ylim=c(50,70))+
   theme(panel.background = element_rect(colour = 'black',fill = 'white' ),panel.border = element_rect(colour = "black",fill=NA, size=1))+
   xlab(expression(paste(Longitude)))+
