@@ -52,31 +52,29 @@ rm(list = ls())
 
 Version = get_latest_version( package="VAST" )
 Version
-wd<-setwd("C:/Users/ellen.yasumiishi/Work/2023/Sockeye")
-
+wd<-setwd("C:/Users/ellen.yasumiishi/Work/GitHub/Sockeye-Ecology-and-Evolution")
 
 #Data set to estimate annual indices
 #Simply removed missing years
 temp<-read.csv("IYSsockeyeCovariates30.csv") 
-Year=temp[,1]	
-Lat	=temp[,2]
-Lon	=temp[,3]
-SST	=temp[,4]
-A0PollockN =temp[,5]	
-J_Pink =temp[,6]	
-Calanus	=temp[,7]
-AirT	=temp[,8]
-HaulDate	=temp[,9]
-StationID	=temp[,10]
-AreaSwept	=temp[,11]
-kg	=temp[,12]
-Sci	=temp[,13]
-vessel	=temp[,14]
-Julian	=temp[,15]
-Constant=temp[,16]
-Lat_rnd=temp[,17]
-Lon_rnd=temp[,18]
-
+Year=temp[,1]	      #Survey year
+Lat	=temp[,2]       #Latitude
+Lon	=temp[,3]       #Longitude
+SST	=temp[,4]       #Sea temperature at 20 m depth
+A0PollockN =temp[,5]#Catch (numbers) of age-0 pollock	
+J_Pink =temp[,6]	  #Catch (kg) of juvenile pink salmon
+Calanus	=temp[,7]   #Calanus copepod density
+AirT	=temp[,8]     #Air temperature not used
+HaulDate	=temp[,9] #Date of surface tow
+StationID	=temp[,10]#Station identification
+AreaSwept	=temp[,11]#Are swept (km^2) of the surface trawl net tow
+kg	=temp[,12]      #Catch (kg) of juvenile sockeye salmon
+Sci	=temp[,13]      #Species name
+vessel	=temp[,14]  #Vessel ID
+Julian	=temp[,15]  #Julian day of the sample
+Constant=temp[,16]  #Constant used for Calanus
+Lat_rnd=temp[,17]   #Rounded Latitude 
+Lon_rnd=temp[,18]   #Rounded Longitude
 
 
 # Exploratory Plots ========================================================================
@@ -111,7 +109,7 @@ if(do.explore.plot==TRUE) {
 
     # Plot Map of Catch Rates
   CPU<-log((kg/AreaSwept)+1)
-    ggplot(temp, aes(x=Lon, y=Lat, color=CPU)) +
+    gmap<-ggplot(temp, aes(x=Lon, y=Lat, color=CPU)) +
     theme_linedraw() +
     scale_color_viridis() +
     geom_point(size=2) +
@@ -150,55 +148,33 @@ if(do.explore.plot==TRUE) {
 # FIGURE 3   MAP OF STUDY AREA 
 ########################################
 
-#Some eastern Bering Sea BASIS data, plot station locations Lon_rnd and Lat_rnd
-temp<-read.csv("IYSsockeyeCovariates30.csv") 
-Year=temp[,1]	
-Lat	=temp[,2]
-Lon	=temp[,3]
-SST	=temp[,4]
-A0PollockN =temp[,5]	
-J_Pink =temp[,6]	
-Calanus	=temp[,7]
-AirT	=temp[,8]
-HaulDate	=temp[,9]
-StationID	=temp[,10]
-AreaSwept	=temp[,11]
-kg	=temp[,12]
-Sci	=temp[,13]
-vessel	=temp[,14]
-Julian	=temp[,15]
-Constant=temp[,16]
-Lat_rnd=temp[,17]
-Lon_rnd=temp[,18]
+# install.packages("devtools")
+devtools::install_github("MattCallahan-NOAA/AKmarineareas", force=TRUE, lib="C:/Program Files/R/R-4.1.3/library")
+install.packages("grid", force=TRUE, lib="C:/Program Files/R/R-4.1.3/library")
+
+install.packages("AKmarineareas")
+install.packages("remotes")
+install.packages("marmap")
+install.packages('raster')
+remove.packages('marmap')
+install.packages('marmap')
 
 library(ggplot2)
 library(maps)
 library(mapdata)
 library(mapproj)
-# install.packages("devtools")
-devtools::install_github("MattCallahan-NOAA/AKmarineareas", force=TRUE, lib="C:/Program Files/R/R-4.1.3/library")
-install.packages("grid", force=TRUE, lib="C:/Program Files/R/R-4.1.3/library")
 library(grid)
-library(AKmarineareas)
-install.packages("AKmarineareas")
-install.packages("remotes")
-install.packages("marmap")
-.libPaths()
-sessionInfo()
-remotes::install_github("MattCallahan-NOAA/AKmarineareas")
 library(AKmarineareas)
 library(sf)
 library(tidyverse)
-install.packages('raster')
 library(raster)
-remove.packages('marmap')
-install.packages('marmap')
 library(marmap)
 library(dplyr)
 library(sp)
 library(ggspatial) # Add a scale bar
-theme_bw()
 
+
+theme_bw()
 #get russia
 russia<-rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")%>%
   filter(name=="Russia")
