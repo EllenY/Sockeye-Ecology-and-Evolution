@@ -400,6 +400,8 @@ check_fit(parameter_estimates, check_gradients = FALSE, quiet = FALSE)
 #Check extrapolation grid total area....
 colSums(fit_Spatiotemporal$extrapolation_list$a_el)
 
+#Total survey area 344,804 km^2
+
 #SAVE DATA =================================================================================
 x=summary(fit_Spatiotemporal$parameter_estimates$SD, select='report')
 print(x)
@@ -418,8 +420,8 @@ nyrs <- length(years)
 #Year=rep(years, each=nrow(ak_map))
 ## Remake map list locally for recreating plots
 mdl <- make_map_info(Region = settings$Region,
-                     spatial_list = fit$spatial_list,
-                     Extrapolation_List = fit$extrapolation_list)
+                     spatial_list = fit_Spatiotemporal$spatial_list,
+                     Extrapolation_List = fit_Spatiotemporal$extrapolation_list)
 ## quick dirty AK map
 ak_map <- subset(map_data("world"), region=='USA' & subregion=='Alaska')
 ## Have to duplicate it for each year so can facet below
@@ -449,10 +451,10 @@ gmap <- ggplot(ak_map, aes(x = long, y = lat, group = group)) +
   guides(fill=guide_legend(title='Energy Density'))
 
 #Densities at each extrapolation grid location
-fit$Report$D_gct
+fit_Spatiotemporal$Report$D_gct
 #Densities at each extrapolation grid location
-names(fit$Report)[grepl('_gc|_gct', x=names(fit$Report))]
-D_gt <- fit$Report$D_gct[,1,] # drop the category
+names(fit_Spatiotemporal$Report)[grepl('_gc|_gct', x=names(fit_Spatiotemporal$Report))]
+D_gt <- fit_Spatiotemporal$Report$D_gct[,1,] # drop the category
 #dimnames(D_gt) <- list(cell=1:nrow(D_gt), year=c(2003:2019))
 dimnames(D_gt) <- list(cell=1:nrow(D_gt), year=years)
 ## tidy way of doing this, reshape2::melt() does
@@ -497,11 +499,15 @@ write.csv(D7, "SOCKEYE_OUT.csv")
 theme_set(theme_bw())
 D7$D<=0.001*D  #Plot the top 99.9% of the densities.
 
+#########################
+#  FIGURE 4
+#########################
+pdf(file="FIGURE 4.pdf", height=11, width=8.5) #This generates the figure as a hi-res (pub quality) tiff file. You can change the dimensions of the figure by changing the height and width arguments. You can change the resolution with the 'res' argument.
 g2 <- gmap + 
   theme_bw()+
   #scale_color_gradientn(colours = colorspace::divergingx_hcl(palette="RdGy", n=7, rev=TRUE),oob=scales::squish,limits=c(0,4))+
   #geom_polygon(data = temp, aes(x = Lon, y = Lat, group = NULL), fill=NA,color="lightgray" ,size = 0.005) +
-  geom_point(data=D7 , aes(Lon, Lat, color=((D)), group=NULL),  #Use log(D) for GRP to covert back from exp(GRP)
+  geom_point(data=D7 , aes(Lon, Lat, color=(log(D)), group=NULL),  #Use log(D) for GRP to covert back from exp(GRP)
              #geom_point(data=temp2 , aes(Lon, Lat, color=(D), group=NULL),  #Use log(D) for GRP to covert back from exp(GRP)
              na.rm=TRUE, size=2, stroke=0, shape=16) +facet_wrap('Year')+ 
  #labs(color=expression(paste("ln(kg/",km^2,")")))+
